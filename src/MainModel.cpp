@@ -1,4 +1,5 @@
 #include "MainModel.h"
+#include <Arduino.h>
 
 enum Event {
     LOW_HUMIDITY,
@@ -28,7 +29,6 @@ enum Event {
 
 //      _stateMachine.add_transition(&_states.PAUSE, &_states.SETTINGS, Event::BOTH_BUTTONS_HELD);   
 //      _stateMachine.add_transition(&_states.PAUSE, &_states.WORKING, Event::PAUSE_COMPLETED);
-
 //  }
 
 void MainModel::loopCallback() {
@@ -36,12 +36,9 @@ void MainModel::loopCallback() {
 
     // Serial.println("MainModel::loopCallback");
     if (buttonA.isStateReady()) { // I don't need this check
-        if (&buttonA.getButtonStates().PRESSED == &buttonA.getState()) {
-            // digitalWrite(13, LOW);
-            // Serial.println("buttonA PRESSED!!!");
+        if (ButtonState::PRESSED == buttonA.getState()) {
             Serial.println("PRESSED");
-        } else if (&buttonA.getButtonStates().HELD == &buttonA.getState()) {
-            // digitalWrite(13, HIGH);
+        } else if (ButtonState::HELD == buttonA.getState()) {
             Serial.println("buttonA HELD!!!");
         }
     }

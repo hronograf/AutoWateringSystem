@@ -69,8 +69,6 @@
 // }
 
 //////////////////////////////////////////////////////////////////////
-// #include "app_api.h" // only needed with flash breakpoints
-// https://stackoverflow.com/questions/43499817/how-to-disable-then-re-enable-a-watchdog-interrupt-for-arduino
 MainModel mainModel = MainModel();
 
 void setup()
@@ -90,48 +88,3 @@ void loop() {
   Serial.println("---------");
   delay(500);
 }
-
-// #include <functional-vlpp.h>
-
-// using namespace vl;
-// using Fn = Func<void()>;
-
-// void myFunc(int a) {
-  
-// }
-
-// const Func<void()>& f = Func<void()>(&setup);
-// const Func<void()>& f2 = Curry<void(int)>(&myFunc)(2);
-
-// using Fn = void (Foo::*)();
-// class Foo {
-//     void func2() {
-//       Serial.println(a);
-//         // cout<<"func_"<< a << endl;
-//     }  
-// public:
-//     int a = 2;
-
-//      Fn get_pointer() {
-//       return &func2;
-//       // return function_binding::Binding<void(Foo*)>::Binder(&Foo::func2, this);
-      
-//       // return function_binding::Binding<void(Foo*)>();
-//         // return Binder<void(Foo*)>(&Foo::func2)(this);
-//         // return std::bind(&Foo::func2, this);
-//     }
-// };
-
-// void loop()
-// {
-//   Foo foo;
-//   // Fn t = foo.get_pointer();
-//   Fn a = &foo.get_pointer;
-//   void (Foo::*)() t = foo.get_pointer();
-//   t();
-//   foo.a = 555;
-//   t();
-//   Serial.println("---------------");
-//   delay(5000);
-// }
-
