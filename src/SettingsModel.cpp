@@ -1,9 +1,11 @@
 #include "SettingsModel.h"
+#include "Arduino.h"
 
 void SettingsModel::next() {
     uint8_t currentOptionIndex = getCurrentOptionIndex();
     currentOptionIndex++;
-    if (currentOptionIndex >= sizeof(_OPTIONS)) {
+    uint8_t optionsSize = sizeof(_OPTIONS)/sizeof(*_OPTIONS);
+    if (currentOptionIndex >= optionsSize) {
         currentOptionIndex = 0;
     }
     _currentOption = _OPTIONS[currentOptionIndex];
@@ -12,7 +14,8 @@ void SettingsModel::next() {
 void SettingsModel::prev() {
     uint8_t currentOptionIndex = getCurrentOptionIndex();
     if (currentOptionIndex == 0) {
-        currentOptionIndex = sizeof(_OPTIONS) - 1;
+        uint8_t optionsSize = sizeof(_OPTIONS)/sizeof(*_OPTIONS);
+        currentOptionIndex = optionsSize - 1;
     } else {
         currentOptionIndex--;
     }
@@ -28,7 +31,8 @@ void SettingsModel::exit() {
 }
 
 uint8_t SettingsModel::getCurrentOptionIndex() {
-    for (uint8_t i = 0; i < sizeof(_OPTIONS); i++) {
+    uint8_t optionsSize = sizeof(_OPTIONS)/sizeof(*_OPTIONS);
+    for (uint8_t i = 0; i < optionsSize; i++) {
         if (_OPTIONS[i] == _currentOption) {
             return i;
         }
@@ -36,6 +40,14 @@ uint8_t SettingsModel::getCurrentOptionIndex() {
     return -1;
 }
 
+
+SettingsOption SettingsModel::getCurrentOption() {
+    return _currentOption;
+}
+
+bool SettingsModel::isCurrentOptionSelected() {
+    return _isCurrentOptionSelected;
+}
 
 uint32_t SettingsModel::getHumidityThreshold() {
     return _humidityThreshold;

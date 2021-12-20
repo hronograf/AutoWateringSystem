@@ -1,3 +1,6 @@
+#ifndef ButtonModel_h
+#define ButtonModel_h
+
 #include <stdint.h>
 
 enum class ButtonState {
@@ -25,3 +28,5 @@ public:
     ButtonState getState();
     void loopCallback();
 };
+
+#endif

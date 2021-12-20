@@ -1,10 +1,31 @@
 
 #include <Arduino.h>
-#include <Wire.h> 
-#include "LiquidCrystal_I2C.h" // Подключение библиотеки
+#include "Controller.h"
+// #include <Wire.h> 
+// #include "LiquidCrystal_I2C.h" // Подключение библиотеки
 //#include <LiquidCrystal_PCF8574.h> // Подключение альтернативной библиотеки
 
-#include "MainModel.h"
+// MainModel mainModel = MainModel();
+
+Controller controller = Controller();
+void setup() {
+  // Serial.begin(9600);
+  // // initialize GDB stub
+  // Serial.begin(9600);
+  
+  // Serial.println("Setup END");
+  // Serial.println("Setup !!!!!!!!!!!!!!!!!");
+  controller.setup();
+}
+
+
+void loop() {
+  controller.loop();
+  // MainModel();
+  // mainModel.loopCallback();
+  // Serial.println("---------");
+  // delay(500);
+}
 
 
 // LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27,20,4); // Указываем I2C адрес (наиболее распространенное значение), а также параметры экрана (в случае LCD 1602 - 2 строки по 16 символов в каждой 
@@ -69,22 +90,4 @@
 // }
 
 //////////////////////////////////////////////////////////////////////
-MainModel mainModel = MainModel();
 
-void setup()
-{
-  Serial.begin(9600);
-  // initialize GDB stub
-  Serial.begin(9600);
-  
-  Serial.println("Setup END");
-  // Serial.println("Setup !!!!!!!!!!!!!!!!!");
-}
-
-
-void loop() {
-  // MainModel();
-  mainModel.loopCallback();
-  Serial.println("---------");
-  delay(500);
-}

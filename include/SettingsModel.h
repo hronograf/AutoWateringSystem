@@ -1,3 +1,6 @@
+#ifndef SettingsModel_h
+#define SettingsModel_h
+
 #include <stdint.h>
 
 enum class SettingsOption {
@@ -29,6 +32,9 @@ public:
     void select();
     void exit();
 
+    SettingsOption getCurrentOption();
+    bool isCurrentOptionSelected();
+
     uint32_t getHumidityThreshold();
     void setHumidityThreshold(uint32_t threshold);
     uint32_t getWateringMs();
@@ -36,3 +42,5 @@ public:
     uint32_t getPauseMs();
     void setPauseMs(uint32_t pauseMs);
 };
+
+#endif

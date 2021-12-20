@@ -16,6 +16,10 @@ void ButtonModel::loopCallback() {
         _lastSeenMillis = currentMillis;
     }
 
+    if (_currentState == ButtonState::INITIAL) {
+        _highVoltageMillis = 0;
+    }
+
     if (_currentState == ButtonState::INITIAL && digitalRead(_PIN_NUMBER)) {
         _currentState = ButtonState::PROCESSING;
 
