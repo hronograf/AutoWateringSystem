@@ -36,21 +36,44 @@ void MainModel::loopCallback() {
     _buttonA.loopCallback();
     _buttonB.loopCallback();
 
-    if (_currentState == MainStates::INITIAL) {
-        initialStateHandler();
-    } else if (_currentState == MainStates::SETTINGS) {
-        settingsStateHandler();
-    } else if (_currentState == MainStates::WORKING) {
-        workingStateHandler();
-    } else if (_currentState == MainStates::WATERING) {
-        // calc ms1-ms2 
+    switch (_currentState) {
+    case MainStates::INITIAL:
+        handleInitialState();
+        break;
+    case MainStates::SETTINGS:
+        handleSettingsState();
+        break;
+    case MainStates::WORKING:
+        handleWorkingState();
+        break;
+    case MainStates::WATERING:
+        handleWateringState(currentMillis);
+        break;
+    case MainStates::PAUSE:
+        handlePauseState(currentMillis);
+        break;
+    
+    default:
+        break;
     }
 
-    _millisFromLastWatering += currentMillis - _lastSeenLoopMillis;
+    // if (_currentState == MainStates::INITIAL) {
+    //     handleInitialState();
+    // } else if (_currentState == MainStates::SETTINGS) {
+    //     handleSettingsState();
+    // } else if (_currentState == MainStates::WORKING) {
+    //     handleWorkingState();
+    // } else if (_currentState == MainStates::WATERING) {
+    //     handleWateringState(currentMillis);
+    // } 
+
+    if (_currentState != MainStates::WATERING && _currentState != MainStates::PAUSE) {
+        _millisFromLastWatering += currentMillis - _lastSeenLoopMillis;
+    }
     _lastSeenLoopMillis = currentMillis;
 }
 
-void MainModel::initialStateHandler() {
+void MainModel::handleInitialState() {
     if (_shouldIgnoreButtons && (_buttonA.getState() != ButtonState::INITIAL || _buttonB.getState() != ButtonState::INITIAL)) {
         return;
     } else {
@@ -63,7 +86,7 @@ void MainModel::initialStateHandler() {
     }
 }
 
-void MainModel::settingsStateHandler() {
+void MainModel::handleSettingsState() {
     if (_shouldIgnoreButtons && (_buttonA.getState() != ButtonState::INITIAL || _buttonB.getState() != ButtonState::INITIAL)) {
         return;
     } else {
@@ -99,7 +122,7 @@ void MainModel::settingsStateHandler() {
     }
 }
 
-void MainModel::workingStateHandler() {
+void MainModel::handleWorkingState() {
     if (_shouldIgnoreButtons && (_buttonA.getState() != ButtonState::INITIAL || _buttonB.getState() != ButtonState::INITIAL)) {
         return;
     } else {
@@ -120,10 +143,54 @@ void MainModel::workingStateHandler() {
 
     _currentHumidityResistance = humidityResistanceSum / _numberOfReadsHumiditySensor;
 
-    if (_currentHumidityResistance > _settingsModel.getHumidityThreshold()) {
+    if (_currentHumidityResistance > _settingsModel.getHumidityThreshold() || _buttonA.getState() == ButtonState::HELD) { // todo remove HELD
         _currentState = MainStates::WATERING;
     }
 }
+
+void MainModel::handleWateringState(unsigned long currentMillis) {
+    if (_shouldIgnoreButtons && (_buttonA.getState() != ButtonState::INITIAL || _buttonB.getState() != ButtonState::INITIAL)) {
+        return;
+    } else {
+        _shouldIgnoreButtons = false;
+    }
+    // run motor
+    Serial.println("motor running");
+    _wateringMs += currentMillis - _lastSeenLoopMillis;
+    if (_wateringMs >= _settingsModel.getWateringMs()) {
+        // stop motor
+        _millisFromLastWatering = 0;
+        _wateringMs = 0;
+        _currentState = MainStates::PAUSE;
+        _shouldIgnoreButtons = true;
+        return;
+    } else if (_buttonA.getState() == ButtonState::HELD && _buttonB.getState() == ButtonState::HELD) {
+        // stop motor
+        _millisFromLastWatering = 0;
+        _wateringMs = 0;
+        _currentState = MainStates::SETTINGS;
+        _shouldIgnoreButtons = true;
+        return;
+    }
+}
+
+void MainModel::handlePauseState(unsigned long currentMillis) {
+    if (_shouldIgnoreButtons && (_buttonA.getState() != ButtonState::INITIAL || _buttonB.getState() != ButtonState::INITIAL)) {
+        return;
+    } else {
+        _shouldIgnoreButtons = false;
+    }
+
+    _pauseMs += currentMillis - _lastSeenLoopMillis;
+    if (_pauseMs >= _settingsModel.getPauseMs()) {
+        _pauseMs = 0;
+        _currentState = MainStates::WORKING;
+    } else if (_buttonA.getState() == ButtonState::HELD && _buttonB.getState() == ButtonState::HELD) {
+        _currentState = MainStates::SETTINGS;
+        _shouldIgnoreButtons = true;
+    }
+}
+
 
 void MainModel::changeOptionValue(SettingsOption option, bool increase) {
     switch (option) {

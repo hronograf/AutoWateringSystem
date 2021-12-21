@@ -1,20 +1,8 @@
 
-#include <Arduino.h>
 #include "Controller.h"
-// #include <Wire.h> 
-// #include "LiquidCrystal_I2C.h" // Подключение библиотеки
-//#include <LiquidCrystal_PCF8574.h> // Подключение альтернативной библиотеки
-
-// MainModel mainModel = MainModel();
 
 Controller controller = Controller();
 void setup() {
-  // Serial.begin(9600);
-  // // initialize GDB stub
-  // Serial.begin(9600);
-  
-  // Serial.println("Setup END");
-  // Serial.println("Setup !!!!!!!!!!!!!!!!!");
   controller.setup();
 }
 

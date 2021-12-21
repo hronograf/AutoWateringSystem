@@ -1,8 +1,18 @@
 #include "LCDView.h"
 
 void LCDView::setup() {
-    _lcd.init();                      
+    _lcd.init();
     _lcd.backlight();
+}
+
+void LCDView::showInitial() {
+    _lcd.clear();
+    _lcd.setCursor(6, 0);
+    _lcd.print(_initialStr1);
+    _lcd.setCursor(5, 1);
+    _lcd.print(_initialStr2);
+    _lcd.setCursor(2, 2);
+    _lcd.print(_initialStr3);
 }
 
 void LCDView::showOptionsMenu(SettingsOption currentOption) {
@@ -67,6 +77,29 @@ void LCDView::showStatus(uint32_t currentHumidity, uint32_t thresholdHumidity, u
     _lcd.print("s");
 }
 
+void LCDView::showWatering() {
+    _lcd.clear();
+    _lcd.setCursor(6, 1);
+    _lcd.print(_wateringStr);
+}
+
+void LCDView::showPause() {
+    _lcd.clear();
+    _lcd.setCursor(7, 1);
+    _lcd.print(_pauseStr);
+    _lcd.setCursor(4, 2);
+    _lcd.print(_waitStr);
+}
+
 void LCDView::clearScrean() {
     _lcd.clear();
+}
+
+void LCDView::on() {                      
+    _lcd.backlight();
+    // _lcd.on();
+}
+
+void LCDView::off() {
+    _lcd.noBacklight();
 }

@@ -14,8 +14,6 @@ private:
     unsigned long _lcdViewLastMs = millis();
     uint8_t _lcdViewLoopPeriodMs = 200;
 
-    void millisOverflowCheck(unsigned long currentMillis);
-
 public:
     void setup();
     void loop();

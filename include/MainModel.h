@@ -34,8 +34,10 @@ private:
     uint32_t _currentHumidityResistance = 0xFFFFFFFF;
     const uint8_t _numberOfReadsHumiditySensor = 10;
     unsigned long _millisFromLastWatering = 0;
+    uint32_t _wateringMs = 0;
+    uint32_t _pauseMs = 0;
 
-    MainStates _currentState = MainStates::WORKING;
+    MainStates _currentState = MainStates::INITIAL;
     bool _shouldIgnoreButtons = false;
     unsigned long _lastSeenLoopMillis = millis();
 
@@ -45,9 +47,12 @@ private:
 
     SettingsModel _settingsModel = SettingsModel();
 
-    void initialStateHandler();
-    void settingsStateHandler();
-    void workingStateHandler();
+    void handleInitialState();
+    void handleSettingsState();
+    void handleWorkingState();
+    void handleWateringState(unsigned long currentMillis);
+    void handlePauseState(unsigned long currentMillis);
+
     void changeOptionValue(SettingsOption option, bool increase);
 
 public:
