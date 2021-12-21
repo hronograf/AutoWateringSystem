@@ -21,7 +21,7 @@ public:
     void setup();
 
     void showOptionsMenu(SettingsOption option);
-    void showSelectedOptionMenu(SettingsOption selectedOption);
+    void showSelectedOptionMenu(SettingsOption selectedOption, uint32_t value);
     void showStatus();
     void showPause();
     void clearScrean();

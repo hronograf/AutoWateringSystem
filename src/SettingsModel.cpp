@@ -65,7 +65,11 @@ uint32_t SettingsModel::getWateringMs() {
 
 void SettingsModel::setWateringMs(uint32_t wateringMs) {
     if (_currentOption == SettingsOption::WATERING_DURATION && _isCurrentOptionSelected) {
-        if (wateringMs >= _minWateringMs) {
+        if (wateringMs > _maxWateringMs) {
+            _wateringMs = _minWateringMs;
+        } else if (wateringMs < _minWateringMs) {
+            _wateringMs = _maxWateringMs;
+        } else {
             _wateringMs = wateringMs;
         }
     }
@@ -77,6 +81,12 @@ uint32_t SettingsModel::getPauseMs() {
 
 void SettingsModel::setPauseMs(uint32_t pauseMs) {
     if (_currentOption == SettingsOption::PAUSE_DURATION && _isCurrentOptionSelected) {
-        _pauseMs = pauseMs;
+        if (pauseMs > _maxPauseMs) {
+            _pauseMs = _minPauseMs;
+        } else if (pauseMs < _minPauseMs) {
+            _pauseMs = _maxPauseMs;
+        } else {
+            _pauseMs = pauseMs;
+        }
     }
 }

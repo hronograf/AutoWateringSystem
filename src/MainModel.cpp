@@ -36,41 +36,81 @@ void MainModel::loopCallback() {
     _buttonB.loopCallback();
 
     if (_currentState == MainStates::INITIAL) {
-        if (_buttonA.getState() == ButtonState::HELD && _buttonB.getState() == ButtonState::HELD) {
-            _currentState = MainStates::SETTINGS;
-            Serial.println("to SETTINGS");
-        }
+        initialStateHandler();
     } else if (_currentState == MainStates::SETTINGS) {
-        // Serial.println("buttonaB: ");
-        // if (_buttonB.getState() == ButtonState::INITIAL)
-        //     Serial.println("INITIAL");
-        // if (_buttonB.getState() == ButtonState::PROCESSING)
-        //     Serial.println("PROCESSING");
-        // if (_buttonB.getState() == ButtonState::PRESSED)
-        //     Serial.println("PRESSED");
-        // if (_buttonB.getState() == ButtonState::HELD)
-        //     Serial.println("HELD");
-        // if (_settingsModel.isCurrentOptionSelected()) {
-            
-        // }
-        if (_buttonA.getState() == ButtonState::PRESSED && _buttonB.getState() == ButtonState::PRESSED) {
+        settingsStateHandler();
+    } else if (_currentState == MainStates::WORKING) {
+        // check humidity
+        // if humidity < threshold change state to watering
+    } else if (_currentState == MainStates::WATERING) {
+        // if curr millis 
+    }
+}
+
+void MainModel::initialStateHandler() {
+    if (_shouldIgnoreButtons && (_buttonA.getState() != ButtonState::INITIAL || _buttonB.getState() != ButtonState::INITIAL)) {
+        return;
+    } else {
+        _shouldIgnoreButtons = false;
+    }
+
+    if (_buttonA.getState() == ButtonState::HELD && _buttonB.getState() == ButtonState::HELD) {
+        _currentState = MainStates::SETTINGS;
+        _shouldIgnoreButtons = true;
+    }
+}
+
+void MainModel::settingsStateHandler() {
+    if (_shouldIgnoreButtons && (_buttonA.getState() != ButtonState::INITIAL || _buttonB.getState() != ButtonState::INITIAL)) {
+        return;
+    } else {
+        _shouldIgnoreButtons = false;
+    }
+
+    if (_settingsModel.isCurrentOptionSelected()) {
+        if (isButtonsPressed()) {
+            _settingsModel.exit();
+            _shouldIgnoreButtons = true;
+            return;
+        } else if ((_buttonA.getState() == ButtonState::PRESSED || _buttonA.getState() == ButtonState::HELD) && _buttonB.getState() == ButtonState::INITIAL) {
+            changeOptionValue(_settingsModel.getCurrentOption(), true);
+        } else if ((_buttonB.getState() == ButtonState::PRESSED || _buttonB.getState() == ButtonState::HELD) && _buttonA.getState() == ButtonState::INITIAL) {
+            changeOptionValue(_settingsModel.getCurrentOption(), false);
+        }
+
+    } else {
+        if (_buttonA.getState() == ButtonState::HELD && _buttonB.getState() == ButtonState::HELD) {
             _currentState = MainStates::INITIAL;
-        } else if (_buttonA.getState() == ButtonState::PRESSED) {
+            _shouldIgnoreButtons = true;
+            return;
+        }
+        if (isButtonsPressed()) {
+            _settingsModel.select();
+            _shouldIgnoreButtons = true;
+            return;
+        } else if (_buttonA.getState() == ButtonState::PRESSED && _buttonB.getState() == ButtonState::INITIAL) {
             _settingsModel.prev();
-        } else if (_buttonB.getState() == ButtonState::PRESSED) {
+        } else if (_buttonB.getState() == ButtonState::PRESSED && _buttonA.getState() == ButtonState::INITIAL) {
             _settingsModel.next();
         }
     }
-    
+}
 
-    // Serial.println("MainModel::loopCallback");
-    // if (buttonA.isStateReady()) { // I don't need this check
-    //     if (ButtonState::PRESSED == buttonA.getState()) {
-    //         Serial.println("PRESSED");
-    //     } else if (ButtonState::HELD == buttonA.getState()) {
-    //         Serial.println("buttonA HELD!!!");
-    //     }
-    // }
+void MainModel::changeOptionValue(SettingsOption option, bool increase) {
+    switch (option) {
+    case SettingsOption::HUMIDITY_THRESHOLD:
+        _settingsModel.setHumidityThreshold(_settingsModel.getHumidityThreshold() + (increase ? 1 : -1));
+        break;
+    case SettingsOption::WATERING_DURATION:
+        _settingsModel.setWateringMs(_settingsModel.getWateringMs() + (increase ? 1 : -1) * 1000);
+        break;
+    case SettingsOption::PAUSE_DURATION:
+        _settingsModel.setPauseMs(_settingsModel.getPauseMs() + (increase ? 1 : -1) * 1000);
+        break;
+    
+    default:
+        break;
+    }
 }
 
 MainStates MainModel::getState() {
@@ -79,4 +119,29 @@ MainStates MainModel::getState() {
 
 SettingsModel& MainModel::getSettingsModel() {
     return _settingsModel;
+}
+
+uint32_t MainModel::getSelectedOptionValue() {
+    switch (_settingsModel.getCurrentOption()) {
+    case SettingsOption::HUMIDITY_THRESHOLD:
+        return _settingsModel.getHumidityThreshold();
+        break;
+    case SettingsOption::WATERING_DURATION:
+        return _settingsModel.getWateringMs();
+        break;
+    case SettingsOption::PAUSE_DURATION:
+        return _settingsModel.getPauseMs();
+        break;
+    
+    default:
+        break;
+    }
+    return 0;
+}
+
+bool MainModel::isButtonsPressed() {
+    bool pressed = _buttonA.getState() == ButtonState::PRESSED && _buttonB.getState() == ButtonState::PRESSED;
+    bool buttonAFirstLow = _buttonA.getState() == ButtonState::PRESSED && _buttonB.getState() == ButtonState::PROCESSING;
+    bool buttonBFirstLow = _buttonA.getState() == ButtonState::PROCESSING && _buttonB.getState() == ButtonState::PRESSED;
+    return pressed || buttonAFirstLow || buttonBFirstLow;
 }

@@ -12,9 +12,15 @@ enum class SettingsOption {
 class SettingsModel {
 private:
     uint32_t _humidityThreshold = 0;
+
     uint32_t _wateringMs = 3000;
     uint32_t _minWateringMs = 1000;
+    uint32_t _maxWateringMs = 999000;
+
     uint32_t _pauseMs = 10000;
+    uint32_t _minPauseMs = 1000;
+    uint32_t _maxPauseMs = 999000;
+
     uint32_t _checkHumidityPeriodMs = 1000;
     const SettingsOption _OPTIONS[3] = {
         SettingsOption::HUMIDITY_THRESHOLD, 
