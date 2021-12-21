@@ -32,6 +32,7 @@ enum Event {
 //  }
 
 void MainModel::loopCallback() {
+    unsigned long currentMillis = millis();
     _buttonA.loopCallback();
     _buttonB.loopCallback();
 
@@ -40,11 +41,13 @@ void MainModel::loopCallback() {
     } else if (_currentState == MainStates::SETTINGS) {
         settingsStateHandler();
     } else if (_currentState == MainStates::WORKING) {
-        // check humidity
-        // if humidity < threshold change state to watering
+        workingStateHandler();
     } else if (_currentState == MainStates::WATERING) {
-        // if curr millis 
+        // calc ms1-ms2 
     }
+
+    _millisFromLastWatering += currentMillis - _lastSeenLoopMillis;
+    _lastSeenLoopMillis = currentMillis;
 }
 
 void MainModel::initialStateHandler() {
@@ -80,7 +83,7 @@ void MainModel::settingsStateHandler() {
 
     } else {
         if (_buttonA.getState() == ButtonState::HELD && _buttonB.getState() == ButtonState::HELD) {
-            _currentState = MainStates::INITIAL;
+            _currentState = MainStates::WORKING;
             _shouldIgnoreButtons = true;
             return;
         }
@@ -93,6 +96,32 @@ void MainModel::settingsStateHandler() {
         } else if (_buttonB.getState() == ButtonState::PRESSED && _buttonA.getState() == ButtonState::INITIAL) {
             _settingsModel.next();
         }
+    }
+}
+
+void MainModel::workingStateHandler() {
+    if (_shouldIgnoreButtons && (_buttonA.getState() != ButtonState::INITIAL || _buttonB.getState() != ButtonState::INITIAL)) {
+        return;
+    } else {
+        _shouldIgnoreButtons = false;
+    }
+
+    if (_buttonA.getState() == ButtonState::HELD && _buttonB.getState() == ButtonState::HELD) {
+        _currentState = MainStates::SETTINGS;
+        _shouldIgnoreButtons = true;
+        return;
+    }
+
+    uint32_t humidityResistanceSum = 0;
+    for (int i = 0; i < _numberOfReadsHumiditySensor; i++) {
+        humidityResistanceSum += analogRead(_HUMIDITY_SENSOR_PIN_NUMBER);
+        delay(1);
+    }
+
+    _currentHumidityResistance = humidityResistanceSum / _numberOfReadsHumiditySensor;
+
+    if (_currentHumidityResistance > _settingsModel.getHumidityThreshold()) {
+        _currentState = MainStates::WATERING;
     }
 }
 
@@ -119,6 +148,14 @@ MainStates MainModel::getState() {
 
 SettingsModel& MainModel::getSettingsModel() {
     return _settingsModel;
+}
+
+unsigned long MainModel::getMillisFromLastWatering() {
+    return _millisFromLastWatering;
+}
+
+uint32_t MainModel::getCurrentHumidityResistance() {
+    return _currentHumidityResistance;
 }
 
 uint32_t MainModel::getSelectedOptionValue() {

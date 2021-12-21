@@ -15,14 +15,18 @@ private:
     const char* _wateringDurationStr = "Watering";
     const char* _pauseDurationStr = "Pause";
 
-    void printMenu(const char* humidityStart, const char* wateringStart, const char* pauseStart);
+    const char* _curHumidityStr = "CurHum: ";
+    const char* _minHumidityStr = "MinHum: ";
+    const char* _tflwStr = "TFLW: ";
+
+    void printOptionsMenu(const char* humidityStart, const char* wateringStart, const char* pauseStart);
 
 public:
     void setup();
 
     void showOptionsMenu(SettingsOption option);
     void showSelectedOptionMenu(SettingsOption selectedOption, uint32_t value);
-    void showStatus();
+    void showStatus(uint32_t currentHumidity, uint32_t thresholdHumidity, unsigned long millisFromLastWatering);
     void showPause();
     void clearScrean();
 };

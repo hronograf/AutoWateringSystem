@@ -55,7 +55,11 @@ uint32_t SettingsModel::getHumidityThreshold() {
 
 void SettingsModel::setHumidityThreshold(uint32_t threshold) {
     if (_currentOption == SettingsOption::HUMIDITY_THRESHOLD && _isCurrentOptionSelected) {
-        _humidityThreshold = threshold;
+        if (threshold >= _maxHumidityTHreshold){
+            _humidityThreshold = _maxHumidityTHreshold;
+        } else {
+            _humidityThreshold = threshold;
+        }
     }
 }
 

@@ -12,6 +12,7 @@ void Controller::loop() {
         _mainModel.loopCallback();
         _mainModelLastMs = currentMillis;
     }
+
     if (currentMillis - _lcdViewLastMs > _lcdViewLoopPeriodMs) {
         if (_mainModel.getState() == MainStates::INITIAL) {
             _lcdView.clearScrean();
@@ -19,6 +20,8 @@ void Controller::loop() {
             _lcdView.showSelectedOptionMenu(_mainModel.getSettingsModel().getCurrentOption(), _mainModel.getSelectedOptionValue());
         } else if (_mainModel.getState() == MainStates::SETTINGS) {
             _lcdView.showOptionsMenu(_mainModel.getSettingsModel().getCurrentOption());
+        } else if (_mainModel.getState() == MainStates::WORKING) {
+            _lcdView.showStatus(_mainModel.getCurrentHumidityResistance(), _mainModel.getSettingsModel().getHumidityThreshold(), _mainModel.getMillisFromLastWatering());
         }
         _lcdViewLastMs = currentMillis;
     }

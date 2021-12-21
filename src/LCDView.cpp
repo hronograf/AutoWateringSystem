@@ -9,20 +9,20 @@ void LCDView::showOptionsMenu(SettingsOption currentOption) {
     _lcd.clear();
     switch (currentOption) {
     case SettingsOption::HUMIDITY_THRESHOLD:
-        printMenu(_activeOptionStr, _inactiveOptionStr, _inactiveOptionStr);
+        printOptionsMenu(_activeOptionStr, _inactiveOptionStr, _inactiveOptionStr);
         break;
     case SettingsOption::WATERING_DURATION:
-        printMenu(_inactiveOptionStr, _activeOptionStr, _inactiveOptionStr);
+        printOptionsMenu(_inactiveOptionStr, _activeOptionStr, _inactiveOptionStr);
         break;
     case SettingsOption::PAUSE_DURATION:
-        printMenu(_inactiveOptionStr, _inactiveOptionStr, _activeOptionStr);
+        printOptionsMenu(_inactiveOptionStr, _inactiveOptionStr, _activeOptionStr);
         break;
     default:
         break;
     }
 }
 
-void LCDView::printMenu(const char* humidityStart, const char* wateringStart, const char* pauseStart) {
+void LCDView::printOptionsMenu(const char* humidityStart, const char* wateringStart, const char* pauseStart) {
     _lcd.setCursor(0, 0);
     _lcd.print(humidityStart);
     _lcd.print(_humidityThresholdStr);
@@ -51,6 +51,20 @@ void LCDView::showSelectedOptionMenu(SettingsOption selectedOption, uint32_t val
     default:
         break;
     }
+}
+
+void LCDView::showStatus(uint32_t currentHumidity, uint32_t thresholdHumidity, unsigned long millisFromLastWatering) {
+    _lcd.clear();
+    _lcd.setCursor(0, 1);
+    _lcd.print(_curHumidityStr);
+    _lcd.print(currentHumidity);
+    _lcd.setCursor(0, 2);
+    _lcd.print(_minHumidityStr);
+    _lcd.print(thresholdHumidity);
+    _lcd.setCursor(0, 3);
+    _lcd.print(_tflwStr);
+    _lcd.print(millisFromLastWatering / 1000);
+    _lcd.print("s");
 }
 
 void LCDView::clearScrean() {
