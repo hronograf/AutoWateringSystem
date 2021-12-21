@@ -12,9 +12,6 @@ ButtonModel::ButtonModel(uint8_t pinNumber, uint16_t millisToBecomePressed, uint
 
 void ButtonModel::loopCallback() {
     unsigned long currentMillis = millis();
-    if (currentMillis < _lastSeenMillis) { // overflow check
-        _lastSeenMillis = currentMillis;
-    }
 
     if (_currentState == ButtonState::INITIAL) {
         _highVoltageMillis = 0;

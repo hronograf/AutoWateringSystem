@@ -97,7 +97,6 @@ void LCDView::clearScrean() {
 
 void LCDView::on() {                      
     _lcd.backlight();
-    // _lcd.on();
 }
 
 void LCDView::off() {

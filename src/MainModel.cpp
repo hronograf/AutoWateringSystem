@@ -1,35 +1,9 @@
 #include "MainModel.h"
 #include <Arduino.h>
 
-enum Event {
-    LOW_HUMIDITY,
-    WATERING_COMPLETED,
-    PAUSE_COMPLETED,
-    BOTH_BUTTONS_PRESSED,
-    BOTH_BUTTONS_HELD,
-};
-
-//  MainModel::MainModel(): _stateMachine(&_states.INITIAL){
-//      // setup states
-//      _states.INITIAL = State();
-//      _states.WORKING = State();
-//      _states.WATERING = State();
-//      _states.PAUSE = State();
-//      _states.SETTINGS = State();
-
-//      // setup transitions
-//      _stateMachine.add_transition(&_states.INITIAL, &_states.SETTINGS, Event::BOTH_BUTTONS_HELD);
-//      _stateMachine.add_transition(&_states.INITIAL, &_states.WORKING, Event::BOTH_BUTTONS_PRESSED);
-
-//      _stateMachine.add_transition(&_states.WORKING, &_states.SETTINGS, Event::BOTH_BUTTONS_HELD);
-//      _stateMachine.add_transition(&_states.WORKING, &_states.WATERING, Event::LOW_HUMIDITY);
-
-//      _stateMachine.add_transition(&_states.WATERING, &_states.SETTINGS, Event::BOTH_BUTTONS_HELD);   
-//      _stateMachine.add_transition(&_states.WATERING, &_states.PAUSE, Event::WATERING_COMPLETED);
-
-//      _stateMachine.add_transition(&_states.PAUSE, &_states.SETTINGS, Event::BOTH_BUTTONS_HELD);   
-//      _stateMachine.add_transition(&_states.PAUSE, &_states.WORKING, Event::PAUSE_COMPLETED);
-//  }
+void MainModel::setup() {
+    pinMode(_MOTOR_PIN_NUMPER, OUTPUT);
+}
 
 void MainModel::loopCallback() {
     unsigned long currentMillis = millis();
@@ -56,16 +30,6 @@ void MainModel::loopCallback() {
     default:
         break;
     }
-
-    // if (_currentState == MainStates::INITIAL) {
-    //     handleInitialState();
-    // } else if (_currentState == MainStates::SETTINGS) {
-    //     handleSettingsState();
-    // } else if (_currentState == MainStates::WORKING) {
-    //     handleWorkingState();
-    // } else if (_currentState == MainStates::WATERING) {
-    //     handleWateringState(currentMillis);
-    // } 
 
     if (_currentState != MainStates::WATERING && _currentState != MainStates::PAUSE) {
         _millisFromLastWatering += currentMillis - _lastSeenLoopMillis;
@@ -141,9 +105,9 @@ void MainModel::handleWorkingState() {
         delay(1);
     }
 
-    _currentHumidityResistance = humidityResistanceSum / _numberOfReadsHumiditySensor;
+    _currentHumidityResistance = 1000/*maxHumTHresh*/-humidityResistanceSum / _numberOfReadsHumiditySensor;
 
-    if (_currentHumidityResistance > _settingsModel.getHumidityThreshold() || _buttonA.getState() == ButtonState::HELD) { // todo remove HELD
+    if (_currentHumidityResistance < _settingsModel.getHumidityThreshold()) {
         _currentState = MainStates::WATERING;
     }
 }
@@ -155,10 +119,11 @@ void MainModel::handleWateringState(unsigned long currentMillis) {
         _shouldIgnoreButtons = false;
     }
     // run motor
-    Serial.println("motor running");
+    digitalWrite(_MOTOR_PIN_NUMPER, HIGH);
     _wateringMs += currentMillis - _lastSeenLoopMillis;
     if (_wateringMs >= _settingsModel.getWateringMs()) {
         // stop motor
+        digitalWrite(_MOTOR_PIN_NUMPER, LOW);
         _millisFromLastWatering = 0;
         _wateringMs = 0;
         _currentState = MainStates::PAUSE;
@@ -166,6 +131,7 @@ void MainModel::handleWateringState(unsigned long currentMillis) {
         return;
     } else if (_buttonA.getState() == ButtonState::HELD && _buttonB.getState() == ButtonState::HELD) {
         // stop motor
+        digitalWrite(_MOTOR_PIN_NUMPER, LOW);
         _millisFromLastWatering = 0;
         _wateringMs = 0;
         _currentState = MainStates::SETTINGS;

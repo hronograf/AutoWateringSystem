@@ -3,7 +3,6 @@
 
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-// #include <LiquidCrystal_PCF8574.h>
 #include "MainModel.h"
 
 class LCDView {

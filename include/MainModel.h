@@ -5,14 +5,6 @@
 #include "ButtonModel.h"
 #include "SettingsModel.h"
 
-// struct MainStates {
-//     State INITIAL;
-//     State WORKING;
-//     State WATERING;
-//     State PAUSE;
-//     State SETTINGS;
-// };
-
 enum class MainStates {
     INITIAL,
     WORKING,
@@ -29,6 +21,7 @@ private:
     const uint16_t _MILLIS_TO_BECOME_HELD = 1000;
     const uint8_t _BUTTON_A_PIN_NUMBER = 7; 
     const uint8_t _BUTTON_B_PIN_NUMBER = 6; 
+    const uint8_t _MOTOR_PIN_NUMPER = 12;
 
     const uint8_t _HUMIDITY_SENSOR_PIN_NUMBER = A0;
     uint32_t _currentHumidityResistance = 0xFFFFFFFF;
@@ -56,6 +49,8 @@ private:
     void changeOptionValue(SettingsOption option, bool increase);
 
 public:
+
+    void setup();
 
     void loopCallback();
 
