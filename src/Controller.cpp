@@ -15,23 +15,23 @@ void Controller::loop() {
 
     if (currentMillis - _lcdViewLastMs > _lcdViewLoopPeriodMs) {
         switch (_mainModel.getState()) {
-        case MainStates::INITIAL:
+        case MainState::INITIAL:
             _lcdView.showInitial();
             break;
-        case MainStates::SETTINGS:
+        case MainState::SETTINGS:
             if (_mainModel.getSettingsModel().isCurrentOptionSelected()) {
                 _lcdView.showSelectedOptionMenu(_mainModel.getSettingsModel().getCurrentOption(), _mainModel.getSelectedOptionValue());
             } else {
                 _lcdView.showOptionsMenu(_mainModel.getSettingsModel().getCurrentOption());
             }
             break;
-        case MainStates::WORKING:
-            _lcdView.showStatus(_mainModel.getCurrentHumidityResistance(), _mainModel.getSettingsModel().getHumidityThreshold(), _mainModel.getMillisFromLastWatering());
+        case MainState::WORKING:
+            _lcdView.showStatus(_mainModel.getCurrentHumidity(), _mainModel.getSettingsModel().getHumidityThreshold(), _mainModel.getMillisFromLastWatering());
             break;
-        case MainStates::WATERING:
+        case MainState::WATERING:
             _lcdView.showWatering();
             break;
-        case MainStates::PAUSE:
+        case MainState::PAUSE:
             _lcdView.showPause();
             break;
 

@@ -5,7 +5,7 @@
 #include "ButtonModel.h"
 #include "SettingsModel.h"
 
-enum class MainStates {
+enum class MainState {
     INITIAL,
     WORKING,
     WATERING,
@@ -24,13 +24,17 @@ private:
     const uint8_t _MOTOR_PIN_NUMPER = 12;
 
     const uint8_t _HUMIDITY_SENSOR_PIN_NUMBER = A0;
-    uint32_t _currentHumidityResistance = 0xFFFFFFFF;
+    uint32_t _currentHumidity = 0xFFFFFFFF;
     const uint8_t _numberOfReadsHumiditySensor = 10;
     unsigned long _millisFromLastWatering = 0;
     uint32_t _wateringMs = 0;
     uint32_t _pauseMs = 0;
+    
+    uint8_t _noInterruptWateringCount = 0;
+    const uint8_t _maxWateringNumberWithoutInterrupt = 3;
+    const uint32_t _wateringInterruptMs = 3*60000;
 
-    MainStates _currentState = MainStates::INITIAL;
+    MainState _currentState = MainState::INITIAL;
     bool _shouldIgnoreButtons = false;
     unsigned long _lastSeenLoopMillis = millis();
 
@@ -54,11 +58,11 @@ public:
 
     void loopCallback();
 
-    MainStates getState();
+    MainState getState();
     SettingsModel& getSettingsModel();
     uint32_t getSelectedOptionValue();
     unsigned long getMillisFromLastWatering();
-    uint32_t getCurrentHumidityResistance();
+    uint32_t getCurrentHumidity();
 };
 
 #endif
